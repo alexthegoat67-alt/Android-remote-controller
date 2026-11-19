@@ -262,63 +262,6 @@
 
   <!-- Password Overlay -->
   <div id="lock-screen">
-    <div class="login-card" id="login-card">
-      <h2>🔒 Remote Access Locked</h2>
-      <p>Enter your Raspberry Pi access password</p>
-      <input type="password" id="password-input" placeholder="Password..." autocomplete="current-password" />
-      <button id="unlock-btn">Unlock Controller</button>
-    </div>
-  </div>
-
-  <div id="screen-wrapper">
-    <div id="phone-screen">
-      <div id="placeholder-text">Live Unfolded Video Feed Will Appear Here</div>
-      <div id="tap-dot"></div>
-    </div>
-  </div>
-
-  <div id="bottom-bar">
-    <span id="title-label">iPhone Duo (Unfolded)</span>
-    <span id="readout">Ready — Tap screen</span>
-    <button id="lock-btn">Lock</button>
-  </div>
-
-  <script>
-    const lockScreen = document.getElementById('lock-screen');
-    const loginCard = document.getElementById('login-card');
-    const passwordInput = document.getElementById('password-input');
-    const unlockBtn = document.getElementById('unlock-btn');
-    const lockBtn = document.getElementById('lock-btn');
-
-    const screenBox = document.getElementById('phone-screen');
-    const tapDot = document.getElementById('tap-dot');
-    const readout = document.getElementById('readout');
-
-    // Stores your typed password in iPad memory only (never saved on GitHub!)
-    let sessionPassword = "";
-
-    // iOS Frosted Glass Wave Effect (Press & Release)
-    function attachGlassWave(element) {
-      element.addEventListener('pointerdown', (e) => {
-        const rect = element.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const wave = document.createElement('div');
-        wave.className = 'ios-glass-wave';
-        wave.style.left = `${x}px`;
-        wave.style.top = `${y}px`;
-        element.appendChild(wave);
-
-        requestAnimationFrame(() => wave.classList.add('holding'));
-
-        const releaseWave = () => {
-          wave.classList.remove('holding');
-          wave.classList.add('releasing');
-          wave.addEventListener('transitionend', () => wave.remove(), { once: true });
-          window.removeEventListener('pointerup', releaseWave);
-          window.removeEventListener('pointercancel', releaseWave);
-        };
 
         window.addEventListener('pointerup', releaseWave);
         window.addEventListener('pointercancel', releaseWave);
