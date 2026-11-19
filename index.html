@@ -332,6 +332,54 @@
       const typed = passwordInput.value.trim();
       if (!typed) {
         loginCard.classList.remove('shake-error');
+        void loginCard.offsetWidth; // Reflow to restart animation
+        loginCard.classList.add('shake-error');
+        passwordInput.focus();
+        return;
+      }
+      sessionPassword = typed;
+      lockScreen.classList.add('unlocked');
+      readout.textContent = "Unlocked — Ready to connect";
+    }
+
+    unlockBtn.addEventListener('click', unlockController);
+    passwordInput.addEventListener('keydown', (e) => {
+          let sessionPassword = "";
+
+    function attachGlassWave(element) {
+      element.addEventListener('pointerdown', (e) => {
+        const rect = element.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const wave = document.createElement('div');
+        wave.className = 'ios-glass-wave';
+        wave.style.left = `${x}px`;
+        wave.style.top = `${y}px`;
+        element.appendChild(wave);
+
+        requestAnimationFrame(() => wave.classList.add('holding'));
+
+        const releaseWave = () => {
+          wave.classList.remove('holding');
+          wave.classList.add('releasing');
+          wave.addEventListener('transitionend', () => wave.remove(), { once: true });
+          window.removeEventListener('pointerup', releaseWave);
+          window.removeEventListener('pointercancel', releaseWave);
+        };
+
+        window.addEventListener('pointerup', releaseWave);
+        window.addEventListener('pointercancel', releaseWave);
+      });
+    }
+
+    attachGlassWave(lockScreen);
+    attachGlassWave(screenBox);
+
+    function unlockController() {
+      const typed = passwordInput.value.trim();
+      if (!typed) {
+        loginCard.classList.remove('shake-error');
         void loginCard.offsetWidth;
         loginCard.classList.add('shake-error');
         passwordInput.focus();
@@ -347,54 +395,61 @@
       if (e.key === 'Enter') unlockController();
     });
 
-Use code with caution.
-lockBtn.addEventListener('click', () => {
-sessionPassword = "";
-passwordInput.value = "";
-lockScreen.classList.remove('unlocked');
-});
-let isDragging = false;
-function updateTouchPosition(event, isInitialTap = false) {
-const rect = screenBox.getBoundingClientRect();
-const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
-const y = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
-const xPercent = ((x / rect.width) * 100).toFixed(1);
-const yPercent = ((y / rect.height) * 100).toFixed(1);
-tapDot.style.left = x + 'px';
-tapDot.style.top = y + 'px';
-tapDot.style.display = 'block';
-if (isInitialTap) {
-const sonar = document.createElement('div');
-sonar.className = 'tap-sonar';
-sonar.style.left = x + 'px';
-sonar.style.top = y + 'px';
-screenBox.appendChild(sonar);
-sonar.addEventListener('animationend', () => sonar.remove(), { once: true });
-}
-readout.textContent = X: ${xPercent}% | Y: ${yPercent}%;
-// Later, send { action: isInitialTap ? 'down' : 'move', password: sessionPassword, x: xPercent / 100, y: yPercent / 100 }
-}
-screenBox.addEventListener('pointerdown', (event) => {
-if (!sessionPassword) return;
-isDragging = true;
-screenBox.setPointerCapture(event.pointerId);
-updateTouchPosition(event, true);
-});
-screenBox.addEventListener('pointermove', (event) => {
-if (!isDragging || !sessionPassword) return;
-updateTouchPosition(event, false);
-});
-function stopDragging(event) {
-if (!isDragging) return;
-isDragging = false;
-if (screenBox.hasPointerCapture(event.pointerId)) {
-screenBox.releasePointerCapture(event.pointerId);
-}
-// Later, send { action: 'up', password: sessionPassword }
-}
-screenBox.addEventListener('pointerup', stopDragging);
-screenBox.addEventListener('pointercancel', stopDragging);
-    </script>
+    lockBtn.addEventListener('click', () => {
+      sessionPassword = "";
+      passwordInput.value = "";
+      lockScreen.classList.remove('unlocked');
+    });
+
+    let isDragging = false;
+
+    function updateTouchPosition(event, isInitialTap = false) {
+      const rect = screenBox.getBoundingClientRect();
+      const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+      const y = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
+
+      const xPercent = ((x / rect.width) * 100).toFixed(1);
+      const yPercent = ((y / rect.height) * 100).toFixed(1);
+
+      tapDot.style.left = x + 'px';
+      tapDot.style.top = y + 'px';
+      tapDot.style.display = 'block';
+
+      if (isInitialTap) {
+        const sonar = document.createElement('div');
+        sonar.className = 'tap-sonar';
+        sonar.style.left = x + 'px';
+        sonar.style.top = y + 'px';
+        screenBox.appendChild(sonar);
+        sonar.addEventListener('animationend', () => sonar.remove(), { once: true });
+      }
+
+      readout.textContent = `X: ${xPercent}% | Y: ${yPercent}%`;
+    }
+
+    screenBox.addEventListener('pointerdown', (event) => {
+      if (!sessionPassword) return;
+      isDragging = true;
+      screenBox.setPointerCapture(event.pointerId);
+      updateTouchPosition(event, true);
+    });
+
+    screenBox.addEventListener('pointermove', (event) => {
+      if (!isDragging || !sessionPassword) return;
+      updateTouchPosition(event, false);
+    });
+
+    function stopDragging(event) {
+      if (!isDragging) return;
+      isDragging = false;
+      if (screenBox.hasPointerCapture(event.pointerId)) {
+        screenBox.releasePointerCapture(event.pointerId);
+      }
+    }
+
+    screenBox.addEventListener('pointerup', stopDragging);
+    screenBox.addEventListener('pointercancel', stopDragging);
+  </script>
 
 </body>
 </html>
