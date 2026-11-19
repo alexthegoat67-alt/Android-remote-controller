@@ -39,16 +39,13 @@ animation: glassWavePulse 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
 100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
 }
-    #screen-wrapper { perspective: 1800px; }
-#folded-duo { position: absolute; height: 82%; aspect-ratio: 1 / 7.5; display: flex; transform-style: preserve-3d; cursor: pointer; z-index: 50; transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease 0.65s; }
-.duo-half { width: 50%; height: 100%; background: linear-gradient(135deg, #2c2c2e 0%, #161618 100%); border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
-.duo-half.left { border-radius: 10px 0 0 10px; transform-origin: right center; }
-.duo-half.right { border-radius: 0 10px 10px 0; transform-origin: left center; }
-#phone-screen.is-folded { transform: scaleX(0.08) rotateY(-25deg); opacity: 0; pointer-events: none; transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease; }
-#phone-screen.is-unfolded { transform: scaleX(1) rotateY(0deg); opacity: 1; pointer-events: auto; transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease; }
-#folded-duo.opening { transform: scaleX(9) scaleY(1.1); opacity: 0; pointer-events: none; }
-#folded-duo.opening .duo-half.left { transform: rotateY(-120deg); }
-#folded-duo.opening .duo-half.right { transform: rotateY(120deg); }
+#screen-wrapper { perspective: 1400px; }
+#duo-3d-book { position: absolute; width: min(94vw, calc((100dvh - 75px) * (2670 / 1878))); aspect-ratio: 2670 / 1878; display: flex; transform-style: preserve-3d; cursor: pointer; z-index: 20; }
+.duo-wing { width: 50%; height: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); border: 3px solid #4b5563; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85); transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1); backface-visibility: visible; }
+.duo-wing.left { border-radius: 20px 0 0 20px; border-right: 1px solid #6b7280; transform-origin: right center; transform: rotateY(86deg); }
+.duo-wing.right { border-radius: 0 20px 20px 0; border-left: 1px solid #6b7280; transform-origin: left center; transform: rotateY(-86deg); }
+#duo-3d-book.open .duo-wing.left, #duo-3d-book.open .duo-wing.right { transform: rotateY(0deg); }
+#phone-screen.hidden-3d { opacity: 0; pointer-events: none; }
     #screen-wrapper {
       flex: 1;
       width: 100%;
@@ -135,12 +132,12 @@ animation: glassWavePulse 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   </style>
 </head>
 <body>
-  <div id="screen-wrapper">
-<div id="folded-duo" title="Tap to unfold iPhone Duo">
-<div class="duo-half left"></div>
-<div class="duo-half right"></div>
+<div id="screen-wrapper">
+<div id="duo-3d-book" title="Tap to unfold iPhone Duo">
+<div class="duo-wing left"></div>
+<div class="duo-wing right"></div>
 </div>
-<div id="phone-screen" class="is-folded">
+<div id="phone-screen" class="hidden-3d">
       <div id="placeholder-text">Waiting for iPhone Duo video stream...</div>
       <div id="tap-dot"></div>
     </div>
@@ -154,12 +151,10 @@ animation: glassWavePulse 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     const tapDot = document.getElementById('tap-dot');
     const readout = document.getElementById('readout');
     let isDragging = false;
-const foldedDuo = document.getElementById('folded-duo');
-foldedDuo.addEventListener('pointerdown', () => {
-foldedDuo.classList.add('opening');
-screenBox.classList.remove('is-folded');
-screenBox.classList.add('is-unfolded');
-setTimeout(() => foldedDuo.remove(), 950);
+const duoBook = document.getElementById('duo-3d-book');
+duoBook.addEventListener('pointerdown', () => {
+duoBook.classList.add('open');
+setTimeout(() => { screenBox.classList.remove('hidden-3d'); duoBook.remove(); }, 950);
 });
 screenBox.addEventListener('pointerdown', (e) => {
 const rect = screenBox.getBoundingClientRect();
