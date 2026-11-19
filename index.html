@@ -22,6 +22,68 @@
       overflow: hidden;
       user-select: none;
     }
+
+    /* --- Login Lock Screen Overlay --- */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(17, 24, 39, 0.96);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+    .login-card {
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    .login-card h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.3rem;
+    }
+    .login-card p {
+      margin: 0 0 20px 0;
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+    .login-card input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #ffffff;
+      font-size: 1rem;
+      outline: none;
+    }
+    .login-card input:focus {
+      border-color: #34d399;
+    }
+    .login-card button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background-color: #10b981;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-card button:active {
+      background-color: #059669;
+    }
+
+    /* --- Main Controller Screen --- */
     #screen-wrapper {
       flex: 1;
       width: 100%;
@@ -30,9 +92,8 @@
       justify-content: center;
       min-height: 0;
     }
-        #phone-screen {
+    #phone-screen {
       position: relative;
-      /* Exact unfolded iPhone Duo inner screen resolution (2670 x 1878 = ~1.42:1) */
       aspect-ratio: 2670 / 1878;
       width: min(94vw, calc((100dvh - 75px) * (2670 / 1878)));
       height: auto;
@@ -47,7 +108,6 @@
       touch-action: none;
       overflow: hidden;
     }
-    /* Subtle center crease line to mimic an unfolded screen */
     #phone-screen::after {
       content: "";
       position: absolute;
@@ -98,9 +158,28 @@
       font-size: 0.95rem;
       color: #34d399;
     }
+    #lock-btn {
+      background: #374151;
+      color: #d1d5db;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Password Overlay -->
+  <div id="lock-screen">
+    <div class="login-card">
+      <h2>🔒 Remote Access Locked</h2>
+      <p>Enter your Raspberry Pi access password</p>
+      <input type="password" id="password-input" placeholder="Password..." autocomplete="current-password" />
+      <button id="unlock-btn">Unlock Controller</button>
+    </div>
+  </div>
 
   <div id="screen-wrapper">
     <div id="phone-screen">
@@ -112,29 +191,58 @@
   <div id="bottom-bar">
     <span id="title-label">iPhone Duo (Unfolded)</span>
     <span id="readout">Ready — Tap screen</span>
+    <button id="lock-btn">Lock</button>
   </div>
 
   <script>
+    const lockScreen = document.getElementById('lock-screen');
+    const passwordInput = document.getElementById('password-input');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const lockBtn = document.getElementById('lock-btn');
+
     const screenBox = document.getElementById('phone-screen');
     const tapDot = document.getElementById('tap-dot');
     const readout = document.getElementById('readout');
 
+    // Stores your typed password in iPad memory only (never saved on GitHub!)
+    let sessionPassword = "";
+
+    function unlockController() {
+      const typed = passwordInput.value.trim();
+      if (!typed) return;
+      sessionPassword = typed;
+      lockScreen.style.display = 'none';
+      readout.textContent = "Unlocked — Ready to connect";
+    }
+
+    unlockBtn.addEventListener('click', unlockController);
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') unlockController();
+    });
+
+    lockBtn.addEventListener('click', () => {
+      sessionPassword = "";
+      passwordInput.value = "";
+      lockScreen.style.display = 'flex';
+    });
+
     screenBox.addEventListener('pointerdown', (event) => {
+      if (!sessionPassword) return; // Blocks taps if somehow locked
+
       const rect = screenBox.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
 
-      // Calculate percentage (0.0% to 100.0%) across the unfolded screen
       const xPercent = ((x / rect.width) * 100).toFixed(1);
       const yPercent = ((y / rect.height) * 100).toFixed(1);
 
-      // Move the red target dot to where you tapped
       tapDot.style.left = x + 'px';
       tapDot.style.top = y + 'px';
       tapDot.style.display = 'block';
 
-      // Display the coordinates
       readout.textContent = `X: ${xPercent}% | Y: ${yPercent}%`;
+
+      // Later, every tap will send: { password: sessionPassword, x: xPercent / 100, y: yPercent / 100 }
     });
   </script>
 
