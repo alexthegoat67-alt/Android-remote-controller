@@ -23,6 +23,109 @@
       user-select: none;
     }
 
+    /* --- Frosted Glass Lock Screen --- */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      overflow: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    #lock-screen.unlocked {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #login-card {
+      position: relative;
+      z-index: 2;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: min(90vw, 360px);
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);
+    }
+    #login-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+      color: #f9fafb;
+    }
+    #login-card p {
+      margin: 0 0 20px;
+      font-size: 0.88rem;
+      color: #9ca3af;
+    }
+    #password-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #0f172a;
+      color: #f9fafb;
+      font-size: 1rem;
+      margin-bottom: 14px;
+      outline: none;
+      text-align: center;
+    }
+    #password-input:focus {
+      border-color: #34d399;
+    }
+    #unlock-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #10b981;
+      color: #064e3b;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+    #unlock-btn:active {
+      background: #059669;
+      transform: scale(0.98);
+    }
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-5px); }
+    }
+    .shake-error {
+      animation: shakeError 0.3s ease;
+    }
+
+    /* --- iOS Glass Ripple Wave --- */
+    .ios-glass-wave {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+      transform: translate(-50%, -50%) scale(0.2);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    }
+    .ios-glass-wave.holding {
+      transform: translate(-50%, -50%) scale(1.6);
+      opacity: 1;
+    }
+    .ios-glass-wave.releasing {
+      transform: translate(-50%, -50%) scale(2.2);
+      opacity: 0;
+    }
+
     /* --- Main Controller Screen --- */
     #screen-wrapper {
       flex: 1;
@@ -143,32 +246,41 @@
 
   <!-- Password Overlay -->
   <div id="lock-screen">
+    <div id="login-card">
+      <h2>iPhone Duo Controller</h2>
+      <p>Enter session password to unlock remote gantry</p>
+      <input type="password" id="password-input" placeholder="Session Password" autocomplete="off" />
+      <button id="unlock-btn">Unlock Controller</button>
+    </div>
+  </div>
 
-        window.addEventListener('pointerup', releaseWave);
-        window.addEventListener('pointercancel', releaseWave);
-      });
-    }
+  <!-- Main Unfolded Screen -->
+  <div id="screen-wrapper">
+    <div id="phone-screen">
+      <div id="placeholder-text">Waiting for iPhone Duo video stream...</div>
+      <div id="tap-dot"></div>
+    </div>
+  </div>
 
-    attachGlassWave(lockScreen);
-    attachGlassWave(screenBox);
+  <!-- Bottom Status Bar -->
+  <div id="bottom-bar">
+    <span id="title-label">iPhone Duo Remote</span>
+    <span id="readout">Locked</span>
+    <button id="lock-btn">Lock</button>
+  </div>
 
-    function unlockController() {
-      const typed = passwordInput.value.trim();
-      if (!typed) {
-        loginCard.classList.remove('shake-error');
-        void loginCard.offsetWidth; // Reflow to restart animation
-        loginCard.classList.add('shake-error');
-        passwordInput.focus();
-        return;
-      }
-      sessionPassword = typed;
-      lockScreen.classList.add('unlocked');
-      readout.textContent = "Unlocked — Ready to connect";
-    }
+  <script>
+    const lockScreen = document.getElementById('lock-screen');
+    const loginCard = document.getElementById('login-card');
+    const passwordInput = document.getElementById('password-input');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const lockBtn = document.getElementById('lock-btn');
+    const screenBox = document.getElementById('phone-screen');
+    const tapDot = document.getElementById('tap-dot');
+    const readout = document.getElementById('readout');
 
-    unlockBtn.addEventListener('click', unlockController);
-    passwordInput.addEventListener('keydown', (e) => {
-          let sessionPassword = "";
+    let sessionPassword = "";
+    let isDragging = false;
 
     function attachGlassWave(element) {
       element.addEventListener('pointerdown', (e) => {
@@ -214,53 +326,28 @@
       readout.textContent = "Unlocked — Ready to connect";
     }
 
+    function lockController() {
+      sessionPassword = "";
+      passwordInput.value = "";
+      tapDot.style.display = "none";
+      lockScreen.classList.remove('unlocked');
+      readout.textContent = "Locked";
+      passwordInput.focus();
+    }
+
     unlockBtn.addEventListener('click', unlockController);
+    lockBtn.addEventListener('click', lockController);
     passwordInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') unlockController();
     });
+
+    function updateTouchPosition(event, isInitialTap) {
+      const rect = screenBox.getBoundingClientRect();
+      const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+      const y = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
 
       const xPercent = ((x / rect.width) * 100).toFixed(1);
       const yPercent = ((y / rect.height) * 100).toFixed(1);
 
       tapDot.style.left = x + 'px';
       tapDot.style.top = y + 'px';
-      tapDot.style.display = 'block';
-
-      if (isInitialTap) {
-        const sonar = document.createElement('div');
-        sonar.className = 'tap-sonar';
-        sonar.style.left = x + 'px';
-        sonar.style.top = y + 'px';
-        screenBox.appendChild(sonar);
-        sonar.addEventListener('animationend', () => sonar.remove(), { once: true });
-      }
-
-      readout.textContent = `X: ${xPercent}% | Y: ${yPercent}%`;
-    }
-
-    screenBox.addEventListener('pointerdown', (event) => {
-      if (!sessionPassword) return;
-      isDragging = true;
-      screenBox.setPointerCapture(event.pointerId);
-      updateTouchPosition(event, true);
-    });
-
-    screenBox.addEventListener('pointermove', (event) => {
-      if (!isDragging || !sessionPassword) return;
-      updateTouchPosition(event, false);
-    });
-
-    function stopDragging(event) {
-      if (!isDragging) return;
-      isDragging = false;
-      if (screenBox.hasPointerCapture(event.pointerId)) {
-        screenBox.releasePointerCapture(event.pointerId);
-      }
-    }
-
-    screenBox.addEventListener('pointerup', stopDragging);
-    screenBox.addEventListener('pointercancel', stopDragging);
-  </script>
-
-</body>
-</html>
