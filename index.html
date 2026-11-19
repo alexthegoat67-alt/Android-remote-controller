@@ -23,125 +23,7 @@
       user-select: none;
     }
 
-    /* --- iOS Frosted Glass Touch Wave --- */
-    .ios-glass-wave {
-      position: absolute;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(0.2);
-      background: radial-gradient(
-        circle,
-        rgba(255, 255, 255, 0.45) 0%,
-        rgba(255, 255, 255, 0.18) 42%,
-        rgba(255, 255, 255, 0) 72%
-      );
-      mix-blend-mode: screen;
-      filter: blur(10px);
-      opacity: 0;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease-out;
-      z-index: 1;
-    }
-    .ios-glass-wave.holding {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(0.85);
-    }
-    .ios-glass-wave.releasing {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(1.55);
-      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-out;
-    }
-
-    /* --- Login Lock Screen Overlay --- */
-    #lock-screen {
-      position: fixed;
-      inset: 0;
-      background-color: rgba(17, 24, 39, 0.78);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 20px;
-      overflow: hidden;
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  backdrop-filter 0.4s ease;
-    }
-    #lock-screen.unlocked {
-      opacity: 0;
-      transform: scale(1.04);
-      backdrop-filter: blur(0px);
-      -webkit-backdrop-filter: blur(0px);
-      pointer-events: none;
-    }
-    .login-card {
-      position: relative;
-      z-index: 2;
-      background-color: rgba(31, 41, 55, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 18px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 360px;
-      text-align: center;
-      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
-    }
-    .shake-error {
-      animation: shake 0.35s ease-in-out;
-      border-color: #ef4444 !important;
-    }
-    .login-card h2 {
-      margin: 0 0 8px 0;
-      font-size: 1.3rem;
-    }
-    .login-card p {
-      margin: 0 0 20px 0;
-      font-size: 0.9rem;
-      color: #9ca3af;
-    }
-    .login-card input {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      border: 1px solid #4b5563;
-      background-color: rgba(17, 24, 39, 0.9);
-      color: #ffffff;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .login-card input:focus {
-      border-color: #34d399;
-      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
-    }
-    .login-card button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background-color: #10b981;
-      color: #ffffff;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.15s ease, transform 0.1s ease;
-    }
-    .login-card button:active {
-      background-color: #059669;
-      transform: scale(0.98);
-    }
-
+=
     /* --- Main Controller Screen --- */
     #screen-wrapper {
       flex: 1;
@@ -337,19 +219,6 @@
     passwordInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') unlockController();
     });
-
-    lockBtn.addEventListener('click', () => {
-      sessionPassword = "";
-      passwordInput.value = "";
-      lockScreen.classList.remove('unlocked');
-    });
-
-    let isDragging = false;
-
-    function updateTouchPosition(event, isInitialTap = false) {
-      const rect = screenBox.getBoundingClientRect();
-      const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
-      const y = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
 
       const xPercent = ((x / rect.width) * 100).toFixed(1);
       const yPercent = ((y / rect.height) * 100).toFixed(1);
