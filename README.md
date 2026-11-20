@@ -5,6 +5,6 @@ current one being used has 8gb of ram and a rockchip RK3588 8 core and it runs a
 
 # Needs to be done 
 
-setup a tunnel 
+setup a cloudflair tunnel and setup python scripts on orange i 5 plus
 
 
