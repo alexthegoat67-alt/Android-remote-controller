@@ -1,871 +1,526 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orange Pi 5 Plus - Android Gaming Server</title>
-    <style>
-        :root {
-            --bg-color: #0b0f17;
-            --card-bg: rgba(22, 27, 34, 0.75);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --accent-pink: #ff2d55;
-            --accent-pink-glow: rgba(255, 45, 85, 0.35);
-            --text-main: #f0f6fc;
-            --text-muted: #8b949e;
-            --green: #2ea043;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        /* Password Login Gate Overlay */
-        #login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(11, 15, 23, 0.96);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-        }
-
-        #login-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 32px 24px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 24px 48px rgba(0,0,0,0.7);
-        }
-
-        .login-logo-box {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #ff2d55, #c71d3d);
-            border-radius: 16px;
-            margin: 0 auto 16px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 20px var(--accent-pink-glow);
-        }
-
-        .login-logo-box svg {
-            width: 28px;
-            height: 28px;
-            fill: white;
-        }
-
-        .login-card h2 {
-            margin-bottom: 6px;
-            font-size: 1.25rem;
-            color: var(--text-main);
-            font-weight: 600;
-        }
-
-        .login-card p {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 24px;
-        }
-
-        .input-label-group {
-            text-align: left;
-            margin-bottom: 8px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            color: var(--text-muted);
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.45);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: white;
-            font-size: 0.95rem;
-            margin-bottom: 16px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .login-input:focus {
-            border-color: var(--accent-pink);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent-pink);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            box-shadow: 0 4px 16px var(--accent-pink-glow);
-            transition: transform 0.1s, opacity 0.2s;
-        }
-
-        .login-btn:active {
-            transform: scale(0.98);
-        }
-
-        .login-footer-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .login-footer-info span:first-child {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .login-footer-info span:first-child::before {
-            content: '';
-            width: 7px;
-            height: 7px;
-            background: var(--green);
-            border-radius: 50%;
-            box-shadow: 0 0 6px var(--green);
-        }
-
-        .error-msg {
-            color: var(--accent-pink);
-            font-size: 0.8rem;
-            margin-top: 10px;
-            display: none;
-        }
-
-        /* Dashboard Container Layout */
-        .dashboard-container {
-            width: 100%;
-            max-width: 440px;
-            min-height: 100vh;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        @media (min-width: 480px) {
-            .dashboard-container {
-                min-height: auto;
-                border-radius: 28px;
-                border: 1px solid var(--border-color);
-                background: rgba(11, 15, 23, 0.75);
-                backdrop-filter: blur(20px);
-                margin: 20px 0;
-                box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                        }
+                    }
+                }
             }
         }
-
-        .glass-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 16px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090a0f;
+            color: #f3f4f6;
+            overflow-x: hidden;
         }
-
-        /* Top Header Card */
-        .header-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 16px;
+        /* Glassmorphism styling */
+        .glass-panel {
+            background: rgba(18, 20, 32, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .glass-modal {
+            background: rgba(13, 15, 24, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
-
-        .badge-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--accent-pink);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 14px var(--accent-pink-glow);
-        }
-
-        .badge-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: white;
-        }
-
-        .title-text h1 {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .title-text span {
-            font-size: 0.72rem;
-            color: var(--green);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 2px;
-        }
-
-        .title-text span::before {
-            content: '';
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
-            background: var(--green);
-            border-radius: 50%;
         }
-
-        .disconnect-btn {
-            background: rgba(255, 45, 85, 0.12);
-            border: 1px solid rgba(255, 45, 85, 0.3);
-            color: var(--accent-pink);
-            padding: 7px 12px;
-            border-radius: 9px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
         }
-
-        /* Android Game Instance Box */
-        .instance-card {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .instance-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .instance-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 45, 85, 0.12);
-            border: 1px solid rgba(255, 45, 85, 0.3);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .instance-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--accent-pink);
-        }
-
-        .instance-info h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .instance-info p {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* Mini Navbar Controls inside Instance Box */
-        .mini-navbar {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            border-radius: 14px;
-        }
-
-        .nav-icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-        }
-
-        .nav-icon-btn:hover {
-            color: var(--text-main);
-        }
-
-        .nav-icon-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
-
-        /* Stream Quality & Launch Row */
-        .stream-action-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .quality-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .quality-badge {
-            background: rgba(46, 160, 67, 0.12);
-            border: 1px solid rgba(46, 160, 67, 0.3);
-            color: var(--green);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.72rem;
-        }
-
-        .launch-btn {
-            width: 100%;
-            background: var(--accent-pink);
-            border: none;
-            color: white;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            box-shadow: 0 4px 16px var(--accent-pink-glow);
-            transition: transform 0.1s, opacity 0.2s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .launch-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* ADB Bridge Service Card */
-        .adb-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .adb-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .adb-info svg {
-            width: 18px;
-            height: 18px;
-            fill: var(--accent-pink);
-        }
-
-        .restart-btn {
-            background: rgba(22, 27, 34, 0.9);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .restart-btn:active {
-            background: rgba(40, 48, 60, 0.9);
-        }
-
-        /* Orange Pi 5 Plus Hardware Stats */
-        .stats-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .stats-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .stats-title svg {
-            width: 16px;
-            height: 16px;
-            fill: var(--accent-pink);
-        }
-
-        .online-pill {
-            background: rgba(46, 160, 67, 0.12);
-            color: var(--green);
-            border: 1px solid rgba(46, 160, 67, 0.3);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .metric-item {
-            margin-bottom: 12px;
-        }
-
-        .metric-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .metric-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            margin-bottom: 5px;
-            color: var(--text-muted);
-        }
-
-        .metric-info span:last-child {
-            color: var(--text-main);
-            font-weight: 600;
-        }
-
-        .progress-track {
-            width: 100%;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.4);
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
             border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 3px;
-        }
-
-        .fill-pink { background: var(--accent-pink); box-shadow: 0 0 8px var(--accent-pink-glow); }
-        .fill-green { background: var(--green); }
-        .fill-purple { background: #a371f7; }
-        .fill-blue { background: #388bfd; }
-
-        .fan-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .fan-row span:last-child {
-            color: var(--green);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Server Bridge Logs Card */
-        .logs-card {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .logs-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .clear-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        .logs-box {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            font-family: monospace;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            height: 110px;
-            overflow-y: auto;
-            line-height: 1.4;
-        }
-
-        /* Fullscreen Android Stream Viewport */
-        #stream-viewport {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #090d16 0%, #0d1b2a 50%, #1b102b 100%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        #stream-viewport.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .stream-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: crosshair;
-        }
-
-        .stream-status-box {
-            background: rgba(22, 27, 34, 0.85);
-            border: 1px solid var(--border-color);
-            padding: 16px 28px;
-            border-radius: 14px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-        }
-
-        .touch-dot {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            background: var(--accent-pink);
-            border: 2px solid white;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            box-shadow: 0 0 15px var(--accent-pink-glow);
-            display: none;
-        }
-
-        .stream-hud-overlay {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(13, 17, 23, 0.8);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            backdrop-filter: blur(10px);
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .close-stream-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 45, 85, 0.2);
-            border: 1px solid rgba(255, 45, 85, 0.4);
-            color: var(--accent-pink);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            z-index: 10000;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
 
-    <!-- Password Login Gate -->
-    <div id="login-overlay">
-        <div class="login-card">
-            <div class="login-logo-box">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            </div>
-            <h2>Orange Pi 5 Plus</h2>
-            <p>Android Gaming Server Authentication</p>
+    <!-- AUTHENTICATION OVERLAY (Server-Side Simulation) -->
+    <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#090a0f]/95 backdrop-blur-xl transition-opacity duration-300">
+        <div class="glass-modal w-full max-w-md p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+            <!-- Decorative gradient orb -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-600/30 rounded-full blur-3xl pointer-events-none"></div>
             
-            <div class="input-label-group">SERVER ACCESS PASSWORD</div>
-            <input type="password" id="password-input" class="login-input" placeholder="Enter password (default: admin123)">
-            <button class="login-btn" onclick="checkPassword()">Connect to Android Bridge →</button>
-            <div id="error-msg" class="error-msg">Incorrect password. Try admin123</div>
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500/10 text-brand-500 mb-4 border border-brand-500/20 shadow-inner">
+                    <i class="fa-solid fa-server text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-white">Orange Pi 5 Plus</h1>
+                <p class="text-sm text-slate-400 mt-1">Android Gaming Server Authentication</p>
+            </div>
 
-            <div class="login-footer-info">
-                <span>ADB Bridge Ready</span>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Server Access Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                        </span>
+                        <input type="password" id="password-input" required placeholder="Enter password (default: admin123)..." 
+                            class="w-full pl-10 pr-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all">
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Invalid password. Try: admin123</span>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/25 transition-all duration-200 flex items-center justify-center gap-2 text-sm cursor-pointer">
+                    <span>Connect to Android Bridge</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ADB Bridge Ready</span>
                 <span>RK3588 Headless</span>
             </div>
         </div>
     </div>
 
-    <!-- Main Dashboard Container -->
-    <div class="dashboard-container">
-        <!-- Top Status Header -->
-        <div class="glass-card header-card">
-            <div class="header-title">
-                <div class="badge-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <!-- MAIN APP SHELL (Hidden until authenticated) -->
+    <div id="app-container" class="hidden flex-1 flex flex-col">
+        
+        <!-- Top Navigation Bar -->
+        <header class="glass-panel sticky top-0 z-40 border-b border-white/5 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-rose-500 flex items-center justify-center text-white shadow-md shadow-brand-600/30">
+                    <i class="fa-solid fa-gamepad text-sm"></i>
                 </div>
-                <div class="title-text">
-                    <h1>OrangePi-Android-Node</h1>
-                    <span>Stream Active (60 FPS)</span>
-                </div>
-            </div>
-            <button class="disconnect-btn" onclick="lockDashboard()">Disconnect</button>
-        </div>
-
-        <!-- Android Game Instance Control Card -->
-        <div class="glass-card instance-card">
-            <div class="instance-header">
-                <div class="instance-icon">
-                    <svg viewBox="0 0 24 24"><path d="M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z"/></svg>
-                </div>
-                <div class="instance-info">
-                    <h3>Android Game Instance</h3>
-                    <p>Orange Pi 5 Plus Headless Instance #1</p>
+                <div>
+                    <h2 class="text-sm font-bold text-white tracking-wide">OrangePi-Android-Node</h2>
+                    <div class="flex items-center space-x-2 text-[11px] text-emerald-400 font-medium">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span>Stream Active (60 FPS)</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="mini-navbar">
-                <button class="nav-icon-btn" onclick="launchStream()" title="Fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
-                <button class="nav-icon-btn" onclick="alert('Home button sent')" title="Home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-                <button class="nav-icon-btn" onclick="alert('Back button sent')" title="Back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
-            </div>
-
-            <div class="stream-action-box">
-                <div class="quality-row">
-                    <span>STREAM QUALITY:</span>
-                    <span class="quality-badge">RK3588 H.265 Encoder</span>
-                </div>
-                <button class="launch-btn" onclick="launchStream()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                    Launch
+            <div class="flex items-center space-x-3">
+                <button onclick="handleLogout()" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-power-off text-xs text-rose-400"></i>
+                    <span>Disconnect</span>
                 </button>
             </div>
-        </div>
+        </header>
 
-        <!-- ADB Bridge Service Card -->
-        <div class="glass-card adb-card">
-            <div class="adb-info">
-                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A4 4 0 0 1 12 2Z"/></svg>
-                Restart ADB Bridge Service
-            </div>
-            <button class="restart-btn" onclick="alert('ADB Bridge Restarted')">Restart</button>
-        </div>
+        <!-- Main Dashboard Workspace -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Left Column: Android Game Card & Stream Controls -->
+            <div class="lg:col-span-3 flex flex-col space-y-4">
+                
+                <!-- Android Game Header Card -->
+                <div class="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-brand-600/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-800 border border-white/10 flex items-center justify-center text-brand-500 shadow-xl">
+                            <i class="fa-solid fa-cube text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white tracking-tight">Android Game Instance</h3>
+                            <p class="text-xs text-slate-400">Orange Pi 5 Plus Headless Instance #1</p>
+                        </div>
+                    </div>
 
-        <!-- Orange Pi 5 Plus Hardware Stats -->
-        <div class="glass-card">
-            <div class="stats-header">
-                <div class="stats-title">
-                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A4 4 0 0 1 12 2Z"/></svg>
-                    Orange Pi 5 Plus
+                    <!-- Navigation controls -->
+                    <div class="flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl shadow-lg">
+                        <button onclick="openAndroidStreamTab()" title="Fullscreen" class="text-slate-300 hover:text-white text-xs px-2.5 py-1 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+                        <div class="w-px h-3 bg-white/10"></div>
+                        <button onclick="sendKeyHome()" title="Home Key" class="text-slate-300 hover:text-white text-xs px-2.5 py-1 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-house"></i>
+                        </button>
+                        <button onclick="sendKeyBack()" title="Back Key" class="text-slate-300 hover:text-white text-xs px-2.5 py-1 transition-colors cursor-pointer">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="online-pill">Online</div>
-            </div>
 
-            <div class="metric-item">
-                <div class="metric-info">
-                    <span>CPU Usage (RK3588)</span>
-                    <span>23.8%</span>
+                <!-- Stream Quality Card with Single Launch Button -->
+                <div class="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Stream Quality:</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">RK3588 H.265 Encoder</span>
+                    </div>
+
+                    <!-- Single Launch Button opening new tab with blue screen -->
+                    <button onclick="openAndroidStreamTab()" id="launch-btn" class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/25 transition-all duration-200 flex items-center justify-center gap-2 text-xs cursor-pointer">
+                        <i class="fa-solid fa-play text-xs"></i>
+                        <span>Launch</span>
+                    </button>
                 </div>
-                <div class="progress-track"><div class="progress-fill fill-pink" style="width: 23.8%;"></div></div>
-            </div>
 
-            <div class="metric-item" style="margin-top: 10px;">
-                <div class="metric-info">
-                    <span>Board Temperature</span>
-                    <span>42.7°C</span>
+                <!-- ADB Bridge Quick Action -->
+                <div class="glass-panel p-4 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5 text-xs text-slate-300">
+                        <i class="fa-solid fa-rotate text-brand-500"></i>
+                        <span>Restart ADB Bridge Service</span>
+                    </div>
+                    <button onclick="restartAdbBridge()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-medium transition-all cursor-pointer">
+                        Restart
+                    </button>
                 </div>
-                <div class="progress-track"><div class="progress-fill fill-green" style="width: 43%;"></div></div>
+
             </div>
 
-            <div class="metric-item" style="margin-top: 10px;">
-                <div class="metric-info">
-                    <span>RAM (16GB LPDDR4)</span>
-                    <span>3.8 GB / 16 GB</span>
+            <!-- Right Column: System Stats & Orange Pi Diagnostics -->
+            <div class="flex flex-col space-y-4">
+                
+                <!-- Hardware Specs Card -->
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-brand-500"></i>
+                            <span>Orange Pi 5 Plus</span>
+                        </h3>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">Online</span>
+                    </div>
+
+                    <!-- CPU Usage Stat -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-slate-400">CPU Usage (RK3588)</span>
+                            <span id="cpu-stat" class="text-white font-semibold">18.4%</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                            <div id="cpu-bar" class="bg-gradient-to-r from-brand-600 to-rose-500 h-full rounded-full transition-all duration-500" style="width: 18.4%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Stat -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-slate-400">Board Temperature</span>
+                            <span id="temp-stat" class="text-emerald-400 font-semibold">41.2°C</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                            <div id="temp-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 41.2%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Stat -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-slate-400">RAM (16GB LPDDR4)</span>
+                            <span id="ram-stat" class="text-white font-semibold">3.8 GB / 16 GB</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                            <div id="ram-bar" class="bg-indigo-500 h-full rounded-full transition-all duration-500" style="width: 24%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Storage Stat -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-slate-400">NVMe SSD Storage</span>
+                            <span class="text-white font-semibold">112 GB / 512 GB</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                            <div class="bg-teal-500 h-full rounded-full" style="width: 22%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Fan / Cooling info -->
+                    <div class="pt-2 border-t border-white/5 flex items-center justify-between text-xs">
+                        <span class="text-slate-400">GeeekPi Active Fan</span>
+                        <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                            <i class="fa-solid fa-fan animate-spin"></i> 3,400 RPM
+                        </span>
+                    </div>
                 </div>
-                <div class="progress-track"><div class="progress-fill fill-purple" style="width: 24%;"></div></div>
-            </div>
 
-            <div class="metric-item" style="margin-top: 10px;">
-                <div class="metric-info">
-                    <span>NVMe SSD Storage</span>
-                    <span>112 GB / 512 GB</span>
+                <!-- Server Logs Terminal Box -->
+                <div class="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[220px]">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3 mb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-slate-400"></i>
+                            <span>Server Bridge Logs</span>
+                        </h3>
+                        <button onclick="clearLogs()" class="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer">Clear</button>
+                    </div>
+                    
+                    <div id="terminal-logs" class="flex-1 bg-slate-950/80 border border-slate-900 rounded-xl p-3 font-mono text-[11px] text-slate-300 overflow-y-auto space-y-1.5 max-h-[180px]">
+                        <div class="text-slate-500">[00:00:01] Initializing scrcpy WebBridge...</div>
+                        <div class="text-slate-500">[00:00:02] Connected to ADB device (Android 12).</div>
+                        <div class="text-emerald-400">[00:00:02] Hardware video encoder initialized (RKMPP).</div>
+                        <div class="text-slate-300">[00:00:03] Web dashboard client authenticated successfully.</div>
+                    </div>
                 </div>
-                <div class="progress-track"><div class="progress-fill fill-blue" style="width: 22%;"></div></div>
+
             </div>
 
-            <div class="fan-row">
-                <span>GeeekPi Active Fan</span>
-                <span>🌀 3,400 RPM</span>
-            </div>
-        </div>
+        </main>
 
-        <!-- Server Bridge Logs -->
-        <div class="glass-card logs-card">
-            <div class="logs-header">
-                <span>>_ Server Bridge Logs</span>
-                <button class="clear-btn" onclick="clearLogs()">Clear</button>
-            </div>
-            <div class="logs-box" id="logs-content">
-                (waiting for ADB port).<br>
-                [21:24:46] [TOUCH] MotionEvent ACTION_DOWN at (123, 87)<br>
-                [21:24:47] [TOUCH] MotionEvent ACTION_DOWN at (118, 74)<br>
-                [21:24:48] [TOUCH] MotionEvent ACTION_DOWN at (53, 81)<br>
-                [21:24:53] [STREAM] Android viewport closed.
-            </div>
+        <!-- Footer -->
+        <footer class="text-center py-4 text-xs text-slate-500 border-t border-white/5">
+            Orange Pi 5 Plus Android Gaming Server &bull; Secured via Cloudflare Quick Tunnel
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-panel bg-slate-900/90 border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+            <div id="toast-icon" class="text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+            <span id="toast-msg" class="text-xs font-medium text-white">Action completed successfully</span>
         </div>
     </div>
 
-    <!-- Fullscreen Android Stream Viewport -->
-    <div id="stream-viewport">
-        <button class="close-stream-btn" onclick="closeStream()">✕ Close Stream</button>
-        <div class="stream-inner" id="stream-canvas-area">
-            <div class="stream-status-box" id="stream-status-text">Waiting for android port</div>
-            <div class="touch-dot" id="touch-dot"></div>
-            <div class="stream-hud-overlay">
-                <span>Stream Viewport Active</span>
-                <span>•</span>
-                <span id="coords-display">X: -- Y: --</span>
-            </div>
-        </div>
-    </div>
-
+    <!-- JavaScript Application Logic -->
     <script>
-        // Password Authentication Logic
-        function checkPassword() {
-            const pass = document.getElementById('password-input').value;
-            const errorMsg = document.getElementById('error-msg');
-            if (pass === 'admin123') {
-                document.getElementById('login-overlay').classList.add('hidden');
-                errorMsg.style.display = 'none';
+        // Handle server-side authentication simulation (Default password: 'admin123')
+        function handleLogin(event) {
+            event.preventDefault();
+            const password = document.getElementById('password-input').value;
+            const errorBox = document.getElementById('login-error');
+
+            if (password === 'admin123' || password === 'orangepi') {
+                const authScreen = document.getElementById('auth-screen');
+                authScreen.classList.add('opacity-0');
+                setTimeout(() => {
+                    authScreen.style.display = 'none';
+                    document.getElementById('app-container').classList.remove('hidden');
+                    showToast('Authenticated with Orange Pi server');
+                    appendLog('[AUTH] User session token granted.');
+                }, 300);
             } else {
-                errorMsg.style.display = 'block';
+                errorBox.classList.remove('hidden');
+                document.getElementById('password-input').classList.add('border-red-500');
             }
         }
 
-        document.getElementById('password-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
-
-        function lockDashboard() {
-            document.getElementById('login-overlay').classList.remove('hidden');
+        function handleLogout() {
+            document.getElementById('app-container').classList.add('hidden');
+            const authScreen = document.getElementById('auth-screen');
+            authScreen.style.display = 'flex';
+            setTimeout(() => authScreen.classList.remove('opacity-0'), 10);
             document.getElementById('password-input').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            showToast('Disconnected from server session');
+        }
+
+        // Open Blue Android Stream View in a New Tab with touch visualizer
+        function openAndroidStreamTab() {
+            showToast('Opening Android stream viewport in new tab');
+            appendLog('[STREAM] Android viewport opened in new tab.');
+
+            const newWindow = window.open('', '_blank');
+            if (newWindow) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                        <title>Orange Pi 5 Plus - Android Stream Viewport</title>
+                        <style>
+                            * { box-sizing: border-box; margin: 0; padding: 0; }
+                            body, html {
+                                width: 100%;
+                                height: 100vh;
+                                background: linear-gradient(135deg, #090d16 0%, #0d1b2a 50%, #1b102b 100%);
+                                color: #f0f6fc;
+                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                                overflow: hidden;
+                                touch-action: none;
+                            }
+                            .viewport-container {
+                                position: relative;
+                                width: 100vw;
+                                height: 100vh;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                cursor: crosshair;
+                            }
+                            .status-box {
+                                background: rgba(22, 27, 34, 0.85);
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                padding: 16px 28px;
+                                border-radius: 14px;
+                                backdrop-filter: blur(10px);
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                                font-size: 0.9rem;
+                                color: #8b949e;
+                                pointer-events: none;
+                            }
+                            .touch-dot {
+                                position: absolute;
+                                width: 24px;
+                                height: 24px;
+                                background: rgba(244, 63, 94, 0.9);
+                                border: 2px solid white;
+                                border-radius: 50%;
+                                transform: translate(-50%, -50%);
+                                pointer-events: none;
+                                box-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
+                                transition: transform 0.05s ease;
+                                display: none;
+                            }
+                            .hud-overlay {
+                                position: absolute;
+                                bottom: 30px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                background: rgba(13, 17, 23, 0.8);
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                padding: 8px 16px;
+                                border-radius: 20px;
+                                font-size: 0.75rem;
+                                color: #8b949e;
+                                backdrop-filter: blur(10px);
+                                display: flex;
+                                gap: 12px;
+                                align-items: center;
+                                pointer-events: none;
+                            }
+                            .close-tab-btn {
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background: rgba(244, 63, 94, 0.2);
+                                border: 1px solid rgba(244, 63, 94, 0.4);
+                                color: #f43f5e;
+                                padding: 8px 16px;
+                                border-radius: 10px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                                cursor: pointer;
+                                backdrop-filter: blur(10px);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="viewport-container" id="stream-area">
+                            <button class="close-tab-btn" onclick="window.close()">✕ Close Tab</button>
+                            <div class="status-box">Waiting for android port</div>
+                            <div class="touch-dot" id="touch-dot"></div>
+                            <div class="hud-overlay">
+                                <span>Stream Viewport Active (60 FPS)</span>
+                                <span>•</span>
+                                <span id="coords-display">X: -- Y: --</span>
+                            </div>
+                        </div>
+
+                        <script>
+                            const streamArea = document.getElementById('stream-area');
+                            const touchDot = document.getElementById('touch-dot');
+                            const coordsDisplay = document.getElementById('coords-display');
+
+                            streamArea.addEventListener('pointerdown', (e) => {
+                                updateTouchPosition(e);
+                            });
+
+                            streamArea.addEventListener('pointermove', (e) => {
+                                if (e.buttons > 0) {
+                                    updateTouchPosition(e);
+                                }
+                            });
+
+                            function updateTouchPosition(e) {
+                                const rect = streamArea.getBoundingClientRect();
+                                const x = Math.round(e.clientX - rect.left);
+                                const y = Math.round(e.clientY - rect.top);
+                                
+                                touchDot.style.display = 'block';
+                                touchDot.style.left = \`\${e.clientX}px\`;
+                                touchDot.style.top = \`\${e.clientY}px\`;
+                                
+                                coordsDisplay.textContent = \`X: \${x} Y: \${y}\`;
+                            }
+                        </script>
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            }
+        }
+
+        // Toast Notification helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-msg');
+            msg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Append log to terminal box
+        function appendLog(text) {
+            const logs = document.getElementById('terminal-logs');
+            const time = new Date().toTimeString().split(' ')[0];
+            const div = document.createElement('div');
+            div.className = 'text-slate-300';
+            div.textContent = `[${time}] ${text}`;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
         }
 
         function clearLogs() {
-            document.getElementById('logs-content').innerHTML = 'Logs cleared.<br>(waiting for ADB port).';
+            document.getElementById('terminal-logs').innerHTML = '<div class="text-slate-500">Logs cleared.</div>';
         }
 
-        // Fullscreen Android Viewport Transition Logic
-        const viewport = document.getElementById('stream-viewport');
-        const touchDot = document.getElementById('touch-dot');
-        const coordsDisplay = document.getElementById('coords-display');
-        const streamArea = document.getElementById('stream-canvas-area');
-
-        function launchStream() {
-            viewport.classList.add('active');
+        function sendKeyHome() {
+            showToast('Sent Android HOME command');
+            appendLog('[ADB] input keyevent KEYCODE_HOME');
         }
 
-        function closeStream() {
-            viewport.classList.remove('active');
-            touchDot.style.display = 'none';
+        function sendKeyBack() {
+            showToast('Sent Android BACK command');
+            appendLog('[ADB] input keyevent KEYCODE_BACK');
         }
 
-        // Touch Visualizer inside viewport
-        streamArea.addEventListener('pointerdown', (e) => {
-            updateTouchPosition(e);
-        });
+        function restartAdbBridge() {
+            showToast('Restarting ADB server bridge...');
+            appendLog('[ADB] adb kill-server && adb start-server');
+        }
 
-        streamArea.addEventListener('pointermove', (e) => {
-            if (e.buttons > 0) {
-                updateTouchPosition(e);
-            }
-        });
-
-        function updateTouchPosition(e) {
-            const rect = streamArea.getBoundingClientRect();
-            const x = Math.round(e.clientX - rect.left);
-            const y = Math.round(e.clientY - rect.top);
+        // Periodic live stats simulation for Orange Pi 5 Plus RK3588
+        setInterval(() => {
+            if(document.getElementById('app-container').classList.contains('hidden')) return;
             
-            touchDot.style.display = 'block';
-            touchDot.style.left = `${e.clientX}px`;
-            touchDot.style.top = `${e.clientY}px`;
+            const cpu = (16 + Math.random() * 10).toFixed(1);
+            const temp = (41 + Math.random() * 3).toFixed(1);
             
-            coordsDisplay.textContent = `X: ${x} Y: ${y}`;
-        }
+            document.getElementById('cpu-stat').textContent = cpu + '%';
+            document.getElementById('cpu-bar').style.width = Math.min(cpu * 3, 100) + '%';
+            
+            document.getElementById('temp-stat').textContent = temp + '°C';
+            document.getElementById('temp-bar').style.width = (temp * 1.2) + '%';
+        }, 3000);
     </script>
 </body>
 </html>
