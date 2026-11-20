@@ -1,210 +1,272 @@
+Here is your updated, complete single-file HTML code. It features your requested dark color styling, the sliding Android panel on the right, the red dot with the white ripple animation, and the percentage progress bar at the bottom of the dashboard.
+You can copy and paste this directly into your index.html file on GitHub:
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>iPhone Duo Unfolded Controller</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaming Server Dashboard</title>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background-color: #111827;
-      color: #f9fafb;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: sans-serif;
+      overflow-x: hidden;
+      background: #121212;
+      color: #ffffff;
+    }
+
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Main Dashboard Content */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: space-between;
-      height: 100dvh;
-      margin: 0;
-      padding: 12px 16px;
-      overflow: hidden;
-      user-select: none;
+      transition: margin-right 0.3s ease;
     }
-    .ios-glass-wave {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
-      transform: translate(-50%, -50%) scale(0.2);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 1;
-      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+
+    .dashboard-header h1 {
+      margin-bottom: 0.5rem;
+      color: #007acc;
     }
-    .ios-glass-wave.animate {
-animation: glassWavePulse 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-    @keyframes glassWavePulse {
-0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
-100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
-}
-#screen-wrapper { perspective: 1400px; }
-#duo-3d-book { position: absolute; width: min(94vw, calc((100dvh - 75px) * (2670 / 1878))); aspect-ratio: 2670 / 1878; display: flex; transform-style: preserve-3d; cursor: pointer; z-index: 20; }
-.duo-wing { width: 50%; height: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); border: 3px solid #4b5563; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85); transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1); backface-visibility: visible; }
-.duo-wing.left { border-radius: 20px 0 0 20px; border-right: 1px solid #6b7280; transform-origin: right center; transform: rotateY(86deg); }
-.duo-wing.right { border-radius: 0 20px 20px 0; border-left: 1px solid #6b7280; transform-origin: left center; transform: rotateY(-86deg); }
-#duo-3d-book.open .duo-wing.left, #duo-3d-book.open .duo-wing.right { transform: rotateY(0deg); }
-#phone-screen.hidden-3d { opacity: 0; pointer-events: none; }
-    #screen-wrapper {
-      flex: 1;
-      width: 100%;
+
+    .dashboard-header p {
+      color: #b0b0b0;
+    }
+
+    /* Red Dot with White Ripple Effect */
+    .status-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      min-height: 0;
+      gap: 12px;
+      margin-top: 1.5rem;
     }
-    #phone-screen {
+
+    .red-dot {
+      width: 14px;
+      height: 14px;
+      background-color: #ff3b30;
+      border-radius: 50%;
       position: relative;
-      aspect-ratio: 2670 / 1878;
-      width: min(94vw, calc((100dvh - 75px) * (2670 / 1878)));
-      height: auto;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 3px solid #374151;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: crosshair;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      touch-action: none;
-      overflow: hidden;
     }
-    #phone-screen::after {
-      content: "";
+
+    .red-dot::after {
+      content: '';
       position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 1px;
-      background: rgba(255, 255, 255, 0.06);
-      pointer-events: none;
-    }
-    #placeholder-text {
-      color: #6b7280;
-      font-size: 1.1rem;
-      pointer-events: none;
-      text-align: center;
-      padding: 20px;
-    }
-    #tap-dot {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      background-color: #ef4444;
-      border: 2px solid #ffffff;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
       border-radius: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      display: none;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
-      z-index: 3;
+      animation: ripple 1.6s infinite ease-out;
     }
-    .tap-sonar {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid rgba(239, 68, 68, 0.85);
-      transform: translate(-50%, -50%) scale(1);
-      pointer-events: none;
-      animation: sonarExpand 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      z-index: 2;
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0.8);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(2.4);
+        opacity: 0;
+      }
     }
-    @keyframes sonarExpand {
-      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
-      100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
+
+    .status-text {
+      font-size: 0.95rem;
+      font-weight: 500;
     }
-    #bottom-bar {
-      width: 100%;
-      max-width: 900px;
+
+    /* Percentage Bar at the Bottom */
+    .bottom-bar-section {
+      margin-top: auto;
+      padding-top: 2rem;
+    }
+
+    .percentage-label {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 6px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-top: 10px;
-      padding: 8px 16px;
-      background-color: #1f2937;
-      border-radius: 10px;
-      font-size: 0.9rem;
+      max-width: 350px;
     }
-    #title-label { font-weight: 600; color: #d1d5db; }
-    #readout { font-family: monospace; font-size: 0.95rem; color: #34d399; }
+
+    .percentage-bar-container {
+      background: #252525;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 8px;
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .percentage-bar {
+      height: 100%;
+      background: #007acc;
+      width: 65%; /* Change this percentage as needed */
+      transition: width 0.4s ease;
+    }
+
+    /* Sliding Android Panel */
+    .android-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 100%;
+      background: #1e1e1e;
+      border-left: 1px solid #333;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%); /* Hidden off-screen to the right by default */
+      transition: transform 0.3s ease-in-out;
+      z-index: 100;
+    }
+
+    /* Active class applied via JS to slide the panel in */
+    .android-panel.open {
+      transform: translateX(0);
+    }
+
+    .panel-header {
+      padding: 1.5rem;
+      background: #252525;
+      border-bottom: 1px solid #333;
+    }
+
+    .panel-header h2 {
+      font-size: 1.2rem;
+      color: #ffffff;
+    }
+
+    .panel-body {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .stream-placeholder {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+    }
+
+    /* Arrow Toggle Button */
+    .slide-btn {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #007acc;
+      color: white;
+      border: none;
+      padding: 1rem 0.6rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+      transition: right 0.3s ease-in-out, background 0.2s, transform 0.3s ease-in-out;
+      z-index: 101;
+    }
+
+    .slide-btn:hover {
+      background: #005999;
+    }
+
+    /* When the panel is open, slide the button along with the panel edge and flip arrow */
+    .slide-btn.shifted {
+      right: 400px;
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    /* Responsive adjustment for mobile screens */
+    @media (max-width: 600px) {
+      .android-panel {
+        width: 100%;
+      }
+      .slide-btn.shifted {
+        right: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-<div id="screen-wrapper">
-<div id="duo-3d-book" title="Tap to unfold iPhone Duo">
-<div class="duo-wing left"></div>
-<div class="duo-wing right"></div>
-</div>
-<div id="phone-screen" class="hidden-3d">
-      <div id="placeholder-text">Waiting for iPhone Duo video stream...</div>
-      <div id="tap-dot"></div>
-    </div>
+
+  <div class="app-container">
+    <!-- Main Content / Dashboard -->
+    <main class="main-content">
+      <div class="dashboard-header">
+        <h1>Gaming Server Dashboard</h1>
+        <p>Click the arrow on the right to open your Android screen view.</p>
+        
+        <!-- Red Dot with White Ripple Effect -->
+        <div class="status-container">
+          <div class="red-dot"></div>
+          <span class="status-text">Server Offline / Connecting</span>
+        </div>
+      </div>
+
+      <!-- Percentage Bar at the Bottom -->
+      <div class="bottom-bar-section">
+        <div class="percentage-label">
+          <span>Server Load / Memory</span>
+          <span>65%</span>
+        </div>
+        <div class="percentage-bar-container">
+          <div class="percentage-bar"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Toggle Arrow Button -->
+    <button id="slideToggleBtn" class="slide-btn" aria-label="Toggle Android Screen">
+      &#10094;
+    </button>
+
+    <!-- Sliding Android Screen Window -->
+    <aside id="androidPanel" class="android-panel">
+      <div class="panel-header">
+        <h2>Android Screen</h2>
+      </div>
+      <div class="panel-body">
+        <div class="stream-placeholder">Android Stream Running Here</div>
+      </div>
+    </aside>
   </div>
-  <div id="bottom-bar">
-    <span id="title-label">iPhone Duo Remote</span>
-    <span id="readout">Ready — Tap screen</span>
-  </div>
+
   <script>
-    const screenBox = document.getElementById('phone-screen');
-    const tapDot = document.getElementById('tap-dot');
-    const readout = document.getElementById('readout');
-    let isDragging = false;
-const duoBook = document.getElementById('duo-3d-book');
-duoBook.addEventListener('pointerdown', () => {
-duoBook.classList.add('open');
-setTimeout(() => { screenBox.classList.remove('hidden-3d'); duoBook.remove(); }, 950);
-});
-screenBox.addEventListener('pointerdown', (e) => {
-const rect = screenBox.getBoundingClientRect();
-const wave = document.createElement('div');
-wave.className = 'ios-glass-wave animate';
-wave.style.left = `${e.clientX - rect.left}px`;
-wave.style.top = `${e.clientY - rect.top}px`;
-screenBox.appendChild(wave);
-wave.addEventListener('animationend', () => wave.remove(), { once: true });
-});
-    function updateTouchPosition(event, isInitialTap) {
-      const rect = screenBox.getBoundingClientRect();
-      const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
-      const y = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
-      const xPercent = ((x / rect.width) * 100).toFixed(1);
-      const yPercent = ((y / rect.height) * 100).toFixed(1);
+    const toggleBtn = document.getElementById('slideToggleBtn');
+    const androidPanel = document.getElementById('androidPanel');
 
-      tapDot.style.left = x + 'px';
-      tapDot.style.top = y + 'px';
-      tapDot.style.display = 'block';
-
-      if (isInitialTap) {
-        const sonar = document.createElement('div');
-        sonar.className = 'tap-sonar';
-        sonar.style.left = x + 'px';
-        sonar.style.top = y + 'px';
-        screenBox.appendChild(sonar);
-        sonar.addEventListener('animationend', () => sonar.remove(), { once: true });
-      }
-      readout.textContent = `X: ${xPercent}% | Y: ${yPercent}%`;
-    }
-
-    screenBox.addEventListener('pointerdown', (event) => {
-      isDragging = true;
-      screenBox.setPointerCapture(event.pointerId);
-      updateTouchPosition(event, true);
+    toggleBtn.addEventListener('click', () => {
+      // Toggle the 'open' class on the panel
+      androidPanel.classList.toggle('open');
+      
+      // Toggle the 'shifted' class on the button to move it and flip the arrow
+      toggleBtn.classList.toggle('shifted');
     });
-    screenBox.addEventListener('pointermove', (event) => {
-      if (!isDragging) return;
-      updateTouchPosition(event, false);
-    });
-    function stopDragging(event) {
-      if (!isDragging) return;
-      isDragging = false;
-      if (screenBox.hasPointerCapture(event.pointerId)) {
-        screenBox.releasePointerCapture(event.pointerId);
-      }
-    }
-    screenBox.addEventListener('pointerup', stopDragging);
-    screenBox.addEventListener('pointercancel', stopDragging);
   </script>
+
 </body>
 </html>
+
