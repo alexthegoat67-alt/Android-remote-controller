@@ -1,271 +1,157 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gaming Server Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Android Gaming Server Controller</title>
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #0d1117;
+      color: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100dvh;
       margin: 0;
-      padding: 0;
-    }
-
-    body, html {
-      width: 100%;
-      height: 100%;
-      font-family: sans-serif;
-      overflow-x: hidden;
-      background: #121212;
-      color: #ffffff;
-    }
-
-    .app-container {
-      display: flex;
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-    }
-
-    /* Main Dashboard Content */
-    .main-content {
-      flex: 1;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: margin-right 0.3s ease;
-    }
-
-    .dashboard-header h1 {
-      margin-bottom: 0.5rem;
-      color: #007acc;
-    }
-
-    .dashboard-header p {
-      color: #b0b0b0;
-    }
-
-    /* Red Dot with White Ripple Effect */
-    .status-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 1.5rem;
-    }
-
-    .red-dot {
-      width: 14px;
-      height: 14px;
-      background-color: #ff3b30;
-      border-radius: 50%;
-      position: relative;
-    }
-
-    .red-dot::after {
-      content: '';
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      right: -5px;
-      bottom: -5px;
-      border: 2px solid rgba(255, 255, 255, 0.9);
-      border-radius: 50%;
-      animation: ripple 1.6s infinite ease-out;
-    }
-
-    @keyframes ripple {
-      0% {
-        transform: scale(0.8);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(2.4);
-        opacity: 0;
-      }
-    }
-
-    .status-text {
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    /* Percentage Bar at the Bottom */
-    .bottom-bar-section {
-      margin-top: auto;
-      padding-top: 2rem;
-    }
-
-    .percentage-label {
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      max-width: 350px;
-    }
-
-    .percentage-bar-container {
-      background: #252525;
-      border-radius: 6px;
+      padding: 12px 16px;
       overflow: hidden;
-      height: 8px;
-      width: 100%;
-      max-width: 350px;
+      user-select: none;
+      cursor: crosshair;
     }
-
-    .percentage-bar {
-      height: 100%;
-      background: #007acc;
-      width: 65%; /* Change this percentage as needed */
-      transition: width 0.4s ease;
-    }
-
-    /* Sliding Android Panel */
-    .android-panel {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 400px;
-      height: 100%;
-      background: #1e1e1e;
-      border-left: 1px solid #333;
-      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      transform: translateX(100%); /* Hidden off-screen to the right by default */
-      transition: transform 0.3s ease-in-out;
-      z-index: 100;
-    }
-
-    /* Active class applied via JS to slide the panel in */
-    .android-panel.open {
-      transform: translateX(0);
-    }
-
-    .panel-header {
-      padding: 1.5rem;
-      background: #252525;
-      border-bottom: 1px solid #333;
-    }
-
-    .panel-header h2 {
-      font-size: 1.2rem;
-      color: #ffffff;
-    }
-
-    .panel-body {
+    #screen-wrapper {
+      position: relative;
       flex: 1;
+      width: 100%;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 1rem;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
     }
-
-    .stream-placeholder {
-      color: #888;
-      font-style: italic;
+    #center-message-box {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px 36px;
+      color: #8b949e;
+      font-size: 1rem;
+      font-weight: 500;
       text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      z-index: 1;
     }
-
-    /* Arrow Toggle Button */
-    .slide-btn {
-      position: fixed;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #007acc;
-      color: white;
-      border: none;
-      padding: 1rem 0.6rem;
-      font-size: 1.2rem;
-      cursor: pointer;
-      border-top-left-radius: 6px;
-      border-bottom-left-radius: 6px;
-      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-      transition: right 0.3s ease-in-out, background 0.2s, transform 0.3s ease-in-out;
-      z-index: 101;
+    #tap-dot {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background-color: #ef4444;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      display: none;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      z-index: 3;
     }
-
-    .slide-btn:hover {
-      background: #005999;
+    .tap-sonar {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(239, 68, 68, 0.85);
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: none;
+      animation: sonarExpand 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 2;
     }
-
-    /* When the panel is open, slide the button along with the panel edge and flip arrow */
-    .slide-btn.shifted {
-      right: 400px;
-      transform: translateY(-50%) rotate(180deg);
+    @keyframes sonarExpand {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+      100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
     }
-
-    /* Responsive adjustment for mobile screens */
-    @media (max-width: 600px) {
-      .android-panel {
-        width: 100%;
-      }
-      .slide-btn.shifted {
-        right: 100%;
-      }
+    #bottom-bar {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 12px 20px;
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
+    #title-label { font-weight: 600; color: #e5e7eb; }
+    #readout { font-family: monospace; font-size: 0.95rem; color: #34d399; }
   </style>
 </head>
 <body>
-
-  <div class="app-container">
-    <!-- Main Content / Dashboard -->
-    <main class="main-content">
-      <div class="dashboard-header">
-        <h1>Gaming Server Dashboard</h1>
-        <p>Click the arrow on the right to open your Android screen view.</p>
-        
-        <!-- Red Dot with White Ripple Effect -->
-        <div class="status-container">
-          <div class="red-dot"></div>
-          <span class="status-text">Server Offline / Connecting</span>
-        </div>
-      </div>
-
-      <!-- Percentage Bar at the Bottom -->
-      <div class="bottom-bar-section">
-        <div class="percentage-label">
-          <span>Server Load / Memory</span>
-          <span>65%</span>
-        </div>
-        <div class="percentage-bar-container">
-          <div class="percentage-bar"></div>
-        </div>
-      </div>
-    </main>
-
-    <!-- Toggle Arrow Button -->
-    <button id="slideToggleBtn" class="slide-btn" aria-label="Toggle Android Screen">
-      &#10094;
-    </button>
-
-    <!-- Sliding Android Screen Window -->
-    <aside id="androidPanel" class="android-panel">
-      <div class="panel-header">
-        <h2>Android Screen</h2>
-      </div>
-      <div class="panel-body">
-        <div class="stream-placeholder">Android Stream Running Here</div>
-      </div>
-    </aside>
+  <div id="screen-wrapper">
+    <div id="center-message-box">Waiting for android port</div>
+    <div id="tap-dot"></div>
+  </div>
+  <div id="bottom-bar">
+    <span id="title-label">iPhone Duo Remote</span>
+    <span id="readout">Ready — Tap screen</span>
   </div>
 
   <script>
-    const toggleBtn = document.getElementById('slideToggleBtn');
-    const androidPanel = document.getElementById('androidPanel');
+    const screenBox = document.getElementById('screen-wrapper');
+    const tapDot = document.getElementById('tap-dot');
+    const readout = document.getElementById('readout');
+    let isDragging = false;
 
-    toggleBtn.addEventListener('click', () => {
-      // Toggle the 'open' class on the panel
-      androidPanel.classList.toggle('open');
-      
-      // Toggle the 'shifted' class on the button to move it and flip the arrow
-      toggleBtn.classList.toggle('shifted');
+    function updateTouchPosition(event, isInitialTap) {
+      const rect = screenBox.getBoundingClientRect();
+      const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+      const y = Math.max(0, Math.min(event.clientY - rect.top, rect.height));
+      const xPercent = ((x / rect.width) * 100).toFixed(1);
+      const yPercent = ((y / rect.height) * 100).toFixed(1);
+
+      tapDot.style.left = x + 'px';
+      tapDot.style.top = y + 'px';
+      tapDot.style.display = 'block';
+
+      if (isInitialTap) {
+        const sonar = document.createElement('div');
+        sonar.className = 'tap-sonar';
+        sonar.style.left = x + 'px';
+        sonar.style.top = y + 'px';
+        screenBox.appendChild(sonar);
+        sonar.addEventListener('animationend', () => sonar.remove(), { once: true });
+      }
+      readout.textContent = `X: ${xPercent}% | Y: ${yPercent}%`;
+    }
+
+    screenBox.addEventListener('pointerdown', (event) => {
+      isDragging = true;
+      screenBox.setPointerCapture(event.pointerId);
+      updateTouchPosition(event, true);
     });
-  </script>
+    
+    screenBox.addEventListener('pointermove', (event) => {
+      if (!isDragging) return;
+      updateTouchPosition(event, false);
+    });
 
+    function stopDragging(event) {
+      if (!isDragging) return;
+      isDragging = false;
+      if (screenBox.hasPointerCapture(event.pointerId)) {
+        screenBox.releasePointerCapture(event.pointerId);
+      }
+    }
+    
+    screenBox.addEventListener('pointerup', stopDragging);
+    screenBox.addEventListener('pointercancel', stopDragging);
+  </script>
 </body>
 </html>
-
