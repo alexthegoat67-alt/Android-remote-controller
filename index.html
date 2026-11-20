@@ -77,14 +77,15 @@
                 <p class="text-sm text-slate-400 mt-1">Android Gaming Server Authentication</p>
             </div>
 
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+            <!-- Changed from <form> to <div> to prevent page reloads on Enter/Click -->
+            <div class="space-y-5">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Server Access Password</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
                             <i class="fa-solid fa-lock text-sm"></i>
                         </span>
-                        <input type="password" id="password-input" required placeholder="Enter password (default: admin123)..." 
+                        <input type="password" id="password-input" placeholder="Enter password (default: admin123)..." 
                             class="w-full pl-10 pr-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all">
                     </div>
                 </div>
@@ -94,11 +95,11 @@
                     <span>Invalid password. Try: admin123</span>
                 </div>
 
-                <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/25 transition-all duration-200 flex items-center justify-center gap-2 text-sm cursor-pointer">
+                <button type="button" onclick="handleLogin()" class="w-full py-3.5 px-4 bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/25 transition-all duration-200 flex items-center justify-center gap-2 text-sm cursor-pointer">
                     <span>Connect to Android Bridge</span>
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
-            </form>
+            </div>
 
             <div class="mt-6 pt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
                 <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> ADB Bridge Ready</span>
@@ -299,8 +300,7 @@
     <!-- JavaScript Application Logic -->
     <script>
         // Handle server-side authentication simulation (Default password: 'admin123')
-        function handleLogin(event) {
-            event.preventDefault();
+        function handleLogin() {
             const password = document.getElementById('password-input').value;
             const errorBox = document.getElementById('login-error');
 
@@ -318,6 +318,13 @@
                 document.getElementById('password-input').classList.add('border-red-500');
             }
         }
+
+        // Allow pressing Enter in password field to trigger login
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
 
         function handleLogout() {
             document.getElementById('app-container').classList.add('hidden');
